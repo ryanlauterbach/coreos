@@ -1,0 +1,36 @@
+#cloud-config
+
+ssh_authorized_keys: 
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtRUEAX7fjjSKK04RBR7ZcdqUy8Ty/4P0lRl+dGyAbNfdknGAut72kgL+/4bP5cTNQueNRZfvCIp6xdH19YdhoNzBZtuuwgfg4inhU79jtKCGmM8VenVXRrQYzZRaECb+zgVzSpAq02sz8vRTt94c9BW8aoVRr81un6y6iv9uQUOyXOaa6jZq+D3/9siXn9dNzV21nIZB9VZm884BZU7WQSuFxlWY1gBOayUp3mQ40z41qKbAnTO806ZClWSIMo7Ju2ZJOc0V/f+dlh2mJucOIPUw2URt/vODq/NVl0qFPVh2WDgfUaaPBkt+5zgy9eMdIXZdQwgoigLZ8b97TNp81 ryan@media
+coreos:  
+  units:
+    - name: format-ephemeral.service
+      command: start
+      content: |
+        [Unit]
+        Description=Formats the ephemeral drive
+        After=dev-sdb.device
+        Requires=dev-sdb.device
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        ExecStart=/bin/bash -c '(/usr/sbin/blkid -t TYPE=ext4 | grep /dev/sdf) || (/usr/sbin/wipefs -f /dev/sdb && /usr/sbin/mkfs.ext4 -F /dev/sdb)'
+    - name: var-lib-docker.mount
+      command: start
+      content: |
+        [Unit]
+        Description=Mount ephemeral to /var/lib/docker
+        Requires=format-ephemeral.service
+        After=format-ephemeral.service
+        [Mount]
+        What=/dev/sdb
+        Where=/var/lib/docker
+        Type=ext4
+    - name: docker.service
+      drop-ins:
+        - name: 10-wait-docker.conf
+          content: |
+            [Unit]
+            After=var-lib-docker.mount
+            Requires=var-lib-docker.mount
+
