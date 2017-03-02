@@ -4,7 +4,6 @@ mkdir -p /root/sda9
 mount /dev/sda9 /mnt || exit 1
 rsync -a /mnt/* /root/sda9
 umount /dev/sda9
-Prepare the partition layout
 
 # delete sda9
 sgdisk /dev/sda --delete=9
@@ -32,7 +31,15 @@ mkfs.ext4 -I 128 -L ROOT /dev/md0
 
 # Copy the Data
 mount /dev/md0 /mnt
-"rsync -a /root/sda9/* /mnt" || exit 1
+rsync -a /root/sda9/* /mnt || exit 1
+
+# set mdadm config and boot option
+mkdir -p /etc/mdadm
+cp mdadm.conf /etc/mdadm/mdadm.conf
+mdadm --detail --scan >> /etc/mdadm/mdadm.conf
+
+cp grub.cfg /usr/share/oem/grub.cfg
+
 umount /mnt
 
 # Wait until resync is finished
