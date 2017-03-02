@@ -34,13 +34,13 @@ mount /dev/md0 /mnt
 rsync -a /root/sda9/* /mnt || exit 1
 
 # set mdadm config and boot option
-mkdir -p /etc/mdadm
-cp mdadm.conf /etc/mdadm/mdadm.conf
-mdadm --detail --scan >> /etc/mdadm/mdadm.conf
+mkdir -p /mnt/etc/mdadm
+cp mdadm.conf /mnt/etc/mdadm/mdadm.conf
+mdadm --detail --scan >> /mnt/etc/mdadm/mdadm.conf
 
-cp grub.cfg /usr/share/oem/grub.cfg
+cp grub.cfg /mnt/usr/share/oem/grub.cfg
 
 umount /mnt
 
 # Wait until resync is finished
-watch -n 1 cat /proc/mdstat
+# watch -n 1 cat /proc/mdstat
