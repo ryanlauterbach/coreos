@@ -38,9 +38,10 @@ mkdir -p /mnt/etc/mdadm
 cp mdadm.conf /mnt/etc/mdadm/mdadm.conf
 mdadm --detail --scan >> /mnt/etc/mdadm/mdadm.conf
 
+mkdir -p /mnt/usr/share/oem
 cp grub.cfg /mnt/usr/share/oem/grub.cfg
 
-umount /mnt
+#umount /mnt
 
 # Wait until resync is finished
 # watch -n 1 cat /proc/mdstat
